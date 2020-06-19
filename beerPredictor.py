@@ -21,6 +21,7 @@ def runRegression(X, Y, cvX, cvY, alpha, normalize):
 	print(accuracy)
 
 
+
 def splitSets(data, label, testPercent, crossValPercent, trainPercent):
 	if(trainPercent + crossValPercent + testPercent > 100):
 		print("ERROR: Sum of percentages greater than 100")
