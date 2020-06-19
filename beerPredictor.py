@@ -17,8 +17,8 @@ def runRegression(X, Y, cvX, cvY, alpha, normalize):
 
 	p = clf.predict(cvX)
 
-	accuracy = mean(double(p == cvY)) * 100
-	print(accuracy)
+	accuracy = np.mean(np.astype(p == cvY)) * 100
+	print("Accuracy: ", accuracy)
 
 
 
@@ -110,6 +110,8 @@ def structureData(filename):
 	data = np.column_stack([data, vbrew_with])
 	data = np.column_stack([data, vferment_years])
 	print("Final Transform Size: ", data.shape)
+
+	np.savetxt("transformed.csv", data, delimiter=",")
 
 	return (data, labels)
 
