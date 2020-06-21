@@ -46,13 +46,10 @@ def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 	print(vferment_years)
 
 	vbrewery = rebuildDummies(vbreweryCol, dataRaw[2])
-	vstyle = rebuildDummies(vbreweryCol, dataRaw[6])
-	vcountry = rebuildDummies(vbreweryCol, dataRaw[7])
+	vstyle = rebuildDummies(vstyleCol, dataRaw[6])
+	vcountry = rebuildDummies(vcountryCol, dataRaw[7])
 
-	print("Stracking structured vectors...")
 	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
-
-	print("Final Transform Size: ", data.shape)
 
 	return data
 
@@ -140,9 +137,6 @@ def structureTrainData(filename):
 
 	dataRaw = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
 
-	print("rows: ", len(dataRaw))
-	print("columns: ", len(dataRaw[0]))
-
 	# Sorting array by drink date
 	print("Sorting array based on drink-date...")
 	dataRaw = dataRaw[np.argsort(dataRaw[:, 10])]
@@ -162,11 +156,16 @@ def structureTrainData(filename):
 	print("Stracking structured vectors...")
 	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
 
-	print("Final Transform Size: ", data.shape)
+	print("Final transform size: ", data.shape)
 
 	vbreweryCol = np.asarray(vbrewery.columns.tolist())
 	vstyleCol = np.asarray(vstyle.columns.tolist())
 	vcountryCol = np.asarray(vcountry.columns.tolist())
+
+	print("BrewCol: ", len(vbreweryCol))
+	print("StyleCol: ", len(vstyleCol))
+	print("CountryCol: ", len(vcountryCol))
+
 
 	return (data, labels, vbreweryCol, vstyleCol, vcountryCol)
 

@@ -9,6 +9,7 @@ lasso_regressor = bp.runRegression(data, labels, crossValX, crossValY)
 
 predictData = bp.structureNewData("newBeer.csv", vbreweryCol, vstyleCol, vcountryCol)
 
+print("Predict data size: ", predictData.shape)
 bp.predictNew(lasso_regressor, predictData)
 
 
