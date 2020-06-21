@@ -33,11 +33,11 @@ def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 	dataRaw = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
 
 	#Structure data columns
-	vabv = np.c_[dataRaw[:,4].astype(np.float)]		# Need to np.c_[] to define as a column vector for hstack / Need to convert to float because otherwise lasso will convert strings to float representation
-	vbrew_with = np.c_[np.where(dataRaw[:,15] != '', 1, 0)]
-	vferment_years = structureFrementYear(dataRaw[:,16], dataRaw[:,10])
+	vabv = np.c_[dataRaw[4].astype(np.float)]		# Need to np.c_[] to define as a column vector for hstack / Need to convert to float because otherwise lasso will convert strings to float representation
+	vbrew_with = np.c_[np.where(dataRaw[15] != '', 1, 0)]
+	vferment_years = structureFrementYear(np.array(dataRaw[16]), np.array(dataRaw[10]))
 
-	vbrewery = rebuildDummies(vbreweryCol, dataRaw[:,2])
+	vbrewery = rebuildDummies(vbreweryCol, dataRaw[2])
 	#vstyle = pandas.get_dummies(dataRaw[:,6],dummy_na=True)
 	#vcountry = pandas.get_dummies(dataRaw[:,7],dummy_na=True)
 	
@@ -110,7 +110,7 @@ def splitSets(data, label, testPercent, crossValPercent, trainPercent):
 
 
 
-def structureFrementYear(tmpbrew_year, tmpdrink_date):
+def structureTrainFrementYear(tmpbrew_year, tmpdrink_date):
 	tmpbrew_year[tmpbrew_year == '\\N'] = 0
 	tmpbrew_year[tmpbrew_year == ''] = 0
 	tmpbrew_year = list(map(int, tmpbrew_year)) 
@@ -151,7 +151,7 @@ def structureTrainData(filename):
 	vstyle = pandas.get_dummies(dataRaw[:,6],dummy_na=True)
 	vcountry = pandas.get_dummies(dataRaw[:,7],dummy_na=True)
 	vbrew_with = np.c_[np.where(dataRaw[:,15] != '', 1, 0)]
-	vferment_years = structureFrementYear(dataRaw[:,16], dataRaw[:,10])
+	vferment_years = structureTrainFrementYear(dataRaw[:,16], dataRaw[:,10])
 
 	print("Stracking structured vectors...")
 	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
