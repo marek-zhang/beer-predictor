@@ -70,6 +70,9 @@ def splitSets(data, label, testPercent, crossValPercent, trainPercent):
 
 	return (trainX, trainY, crossValX, crossValY, testX, testY)
 
+
+
+
 def structureFrementYear(tmpbrew_year, tmpdrink_date):
 	tmpbrew_year[tmpbrew_year == '\\N'] = 0
 	tmpbrew_year[tmpbrew_year == ''] = 0
@@ -90,7 +93,7 @@ def structureFrementYear(tmpbrew_year, tmpdrink_date):
 	return vferment_years
 
 
-def structureData(filename):
+def structureTrainData(filename):
 
 	lines = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
 

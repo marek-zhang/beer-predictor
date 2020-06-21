@@ -1,6 +1,6 @@
 import beerPredictor as bp 
 
-(data, labels) = bp.structureData("beers.csv")
+(data, labels) = bp.structureTrainData("beers.csv")
 
 (trainX, trainY, crossValX, crossValY, testX, testY) = bp.splitSets(data, labels, 10, 10, 80)
 
