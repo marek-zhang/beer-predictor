@@ -4,21 +4,42 @@ import matplotlib
 import matplotlib.pyplot as plt
 import jupyter 
 import pandas 
+from sklearn.model_selection import GridSearchCV
 from sklearn import linear_model as lm
+from sklearn import metrics as mc
 from numpy import loadtxt
 
-def runRegression(X, Y, cvX, cvY, alpha, normalize):
-	clf = lm.Lasso(alpha=alpha, normalize=normalize)
-	clf.fit(X, Y)
-	print(clf.coef_)
-	print(clf.intercept_)
 
-	cvX = cvX.astype(np.float64)
+def predictNew(lasso_regressor, X):
+	print(lasso_regressor.predict(X))
 
-	p = clf.predict(cvX)
 
-	accuracy = np.mean(np.astype(p == cvY)) * 100
-	print("Accuracy: ", accuracy)
+def runRegression(X, Y, cvX, cvY):
+
+	
+	lasso = lm.Lasso(max_iter = 2000)
+
+	#parameters = {'alpha': [1e-15, 1e-10, 1e-8, 1e-4, 1e-3, 1e-2, 1, 5, 10, 20]}
+	parameters = {'alpha': [0.0001, 0.0003, 0.001, 0.003, 0.03, 0.1, 0.3, 1, 3]}
+
+	lasso_regressor = GridSearchCV(lasso, parameters, scoring='neg_mean_squared_error', cv=5)
+
+	lasso_regressor.fit(X, Y)
+
+
+	print(lasso_regressor.best_params_)
+	print(lasso_regressor.best_score_)
+	#p = clf.predict(cvX)
+	#clf.fit(X, Y)
+	#accuracy = mc.mean_squared_error(cvY, p)
+
+	#np.savetxt("cvActual.txt", cvX, delimiter=",")
+	#np.savetxt("cvPredict.txt", p, delimiter=",")
+
+	#print("Accuracy: ", accuracy)
+
+	return lasso_regressor
+
 
 
 
@@ -49,7 +70,6 @@ def splitSets(data, label, testPercent, crossValPercent, trainPercent):
 	testX = data[totalRows - testSize:totalRows,:]
 	testY = label[totalRows - testSize:totalRows]
 
-	print("size testY : ", testY.shape)
 
 	crossValX = data[crossValRowStart : crossValRowEnd , :]
 	crossValY = label[crossValRowStart : crossValRowEnd]
@@ -67,10 +87,6 @@ def structureData(filename):
 	print("rows: ", len(lines))
 	print("columns: ", len(lines[0]))
 
-	#Delete column headings
-	dataRaw = np.delete(lines, 0, 0)
-
-
 	# Sorting array by drink date
 	print("Sorting array based on drink-date...")
 	dataRaw = dataRaw[np.argsort(dataRaw[:, 10])]
@@ -78,13 +94,13 @@ def structureData(filename):
 	#Extract labels
 
 	print("Splitting labels from input...")
-	labels = dataRaw[:,5]
+	labels = np.c_[dataRaw[:,5].astype(np.float)]	
 
 	vbrewery = pandas.get_dummies(dataRaw[:,2])
-	vabv = dataRaw[:,4]
+	vabv = np.c_[dataRaw[:,4].astype(np.float)]		# Need to np.c_[] to define as a column vector for hstack / Need to convert to float because otherwise lasso will convert strings to float representation
 	vstyle = pandas.get_dummies(dataRaw[:,6])
 	vcountry = pandas.get_dummies(dataRaw[:,7])
-	vbrew_with = np.where(dataRaw[:,15] != '', 1, 0)
+	vbrew_with = np.c_[np.where(dataRaw[:,15] != '', 1, 0)]
 
 	tmpbrew_year = dataRaw[:,16]
 	tmpbrew_year[tmpbrew_year == '\\N'] = 0
@@ -102,16 +118,18 @@ def structureData(filename):
 		if tmpbrew_year[idx] > 0:
 			vferment_years[idx] = tmpdrink_date[idx] - tmpbrew_year[idx]
 
+	vferment_years = np.c_[vferment_years]
 
 	print("Stracking structured vectors...")
-	data = np.column_stack([vabv, vbrewery])
-	data = np.column_stack([data, vstyle])
-	data = np.column_stack([data, vcountry])
-	data = np.column_stack([data, vbrew_with])
-	data = np.column_stack([data, vferment_years])
-	print("Final Transform Size: ", data.shape)
+	#data = np.column_stack([vabv, vbrewery])
+	#data = np.column_stack([data, vstyle])
+	#data = np.column_stack([data, vcountry])
+	#data = np.column_stack([data, vbrew_with])
+	#data = np.column_stack([data, vferment_years])
 
-	np.savetxt("transformed.csv", data, delimiter=",")
+	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
+
+	print("Final Transform Size: ", data.shape)
 
 	return (data, labels)
 

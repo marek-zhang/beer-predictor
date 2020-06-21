@@ -4,6 +4,13 @@ import beerPredictor as bp
 
 (trainX, trainY, crossValX, crossValY, testX, testY) = bp.splitSets(data, labels, 10, 10, 80)
 
-bp.runRegression(trainX, trainY, crossValX, crossValY, 1.0, False)
+#lasso_regressor = bp.runRegression(trainX, trainY, crossValX, crossValY)
+lasso_regressor = bp.runRegression(data, labels, crossValX, crossValY)
 
-#Lasso
+(newData, newLabels) = bp.structureData("newBeer.csv")
+
+bp.predictNew(lasso_regressor, newData)
+
+
+
+

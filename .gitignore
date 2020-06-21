@@ -12,4 +12,5 @@ bin-release/
 .DS_Store
 *.pyc
 *.csv
-
+*.txt
+test.py
