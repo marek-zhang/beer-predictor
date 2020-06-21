@@ -116,12 +116,11 @@ def structureTrainData(filename):
 	vbrew_with = np.c_[np.where(dataRaw[:,15] != '', 1, 0)]
 	vferment_years = structureFrementYear(dataRaw[:,16], dataRaw[:,10])
 
-
 	print("Stracking structured vectors...")
 	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
 
 	print("Final Transform Size: ", data.shape)
 
-	return (data, labels)
+	return (data, labels, vbrewery.columns, vstyle.columns, vcountry.columns)
 
 
