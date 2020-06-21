@@ -13,6 +13,27 @@ from numpy import loadtxt
 def predictNew(lasso_regressor, X):
 	print(lasso_regressor.predict(X))
 
+def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
+	print("Loading new data...")
+	lines = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
+
+	#Structure data columns
+	vabv = np.c_[dataRaw[:,4].astype(np.float)]		# Need to np.c_[] to define as a column vector for hstack / Need to convert to float because otherwise lasso will convert strings to float representation
+	vbrew_with = np.c_[np.where(dataRaw[:,15] != '', 1, 0)]
+	vferment_years = structureFrementYear(dataRaw[:,16], dataRaw[:,10])
+
+	vbrewery = pandas.get_dummies(dataRaw[:,2],dummy_na=True)
+	vstyle = pandas.get_dummies(dataRaw[:,6],dummy_na=True)
+	vcountry = pandas.get_dummies(dataRaw[:,7],dummy_na=True)
+	
+
+	print("Stracking structured vectors...")
+	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
+
+	print("Final Transform Size: ", data.shape)
+
+	return data
+
 
 def runRegression(X, Y, cvX, cvY):
 
@@ -121,6 +142,10 @@ def structureTrainData(filename):
 
 	print("Final Transform Size: ", data.shape)
 
-	return (data, labels, vbrewery.columns, vstyle.columns, vcountry.columns)
+	vbreweryCol = np.asarray(vbrewery.columns.tolist())
+	vstyleCol = np.asarray(vstyle.columns.tolist())
+	vcountryCol = np.asarray(vcountry.columns.tolist())
+
+	return (data, labels, vbreweryCol, vstyleCol, vcountryCol)
 
 
