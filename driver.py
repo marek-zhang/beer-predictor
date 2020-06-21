@@ -7,9 +7,9 @@ import beerPredictor as bp
 #lasso_regressor = bp.runRegression(trainX, trainY, crossValX, crossValY)
 lasso_regressor = bp.runRegression(data, labels, crossValX, crossValY)
 
-(newData, newLabels) = bp.structureData("newBeer.csv")
+#(newData, newLabels) = bp.structureData("newBeer.csv")
 
-bp.predictNew(lasso_regressor, newData)
+#bp.predictNew(lasso_regressor, newData)
 
 
 

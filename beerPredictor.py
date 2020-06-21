@@ -19,7 +19,6 @@ def runRegression(X, Y, cvX, cvY):
 	
 	lasso = lm.Lasso(max_iter = 2000)
 
-	#parameters = {'alpha': [1e-15, 1e-10, 1e-8, 1e-4, 1e-3, 1e-2, 1, 5, 10, 20]}
 	parameters = {'alpha': [0.0001, 0.0003, 0.001, 0.003, 0.03, 0.1, 0.3, 1, 3]}
 
 	lasso_regressor = GridSearchCV(lasso, parameters, scoring='neg_mean_squared_error', cv=5)
@@ -29,14 +28,6 @@ def runRegression(X, Y, cvX, cvY):
 
 	print(lasso_regressor.best_params_)
 	print(lasso_regressor.best_score_)
-	#p = clf.predict(cvX)
-	#clf.fit(X, Y)
-	#accuracy = mc.mean_squared_error(cvY, p)
-
-	#np.savetxt("cvActual.txt", cvX, delimiter=",")
-	#np.savetxt("cvPredict.txt", p, delimiter=",")
-
-	#print("Accuracy: ", accuracy)
 
 	return lasso_regressor
 
@@ -79,35 +70,11 @@ def splitSets(data, label, testPercent, crossValPercent, trainPercent):
 
 	return (trainX, trainY, crossValX, crossValY, testX, testY)
 
-
-def structureData(filename):
-
-	lines = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
-
-	print("rows: ", len(lines))
-	print("columns: ", len(lines[0]))
-
-	# Sorting array by drink date
-	print("Sorting array based on drink-date...")
-	dataRaw = dataRaw[np.argsort(dataRaw[:, 10])]
-
-	#Extract labels
-
-	print("Splitting labels from input...")
-	labels = np.c_[dataRaw[:,5].astype(np.float)]	
-
-	vbrewery = pandas.get_dummies(dataRaw[:,2])
-	vabv = np.c_[dataRaw[:,4].astype(np.float)]		# Need to np.c_[] to define as a column vector for hstack / Need to convert to float because otherwise lasso will convert strings to float representation
-	vstyle = pandas.get_dummies(dataRaw[:,6])
-	vcountry = pandas.get_dummies(dataRaw[:,7])
-	vbrew_with = np.c_[np.where(dataRaw[:,15] != '', 1, 0)]
-
-	tmpbrew_year = dataRaw[:,16]
+def structureFrementYear(tmpbrew_year, tmpdrink_date):
 	tmpbrew_year[tmpbrew_year == '\\N'] = 0
 	tmpbrew_year[tmpbrew_year == ''] = 0
 	tmpbrew_year = list(map(int, tmpbrew_year)) 
 
-	tmpdrink_date = dataRaw[:,10]
 	tmpdrink_date[tmpdrink_date == ''] = '0000'
 	tmpdrink_date = list(map(lambda x: x[0:4], tmpdrink_date))
 	tmpdrink_date = list(map(int, tmpdrink_date)) 
@@ -120,13 +87,34 @@ def structureData(filename):
 
 	vferment_years = np.c_[vferment_years]
 
-	print("Stracking structured vectors...")
-	#data = np.column_stack([vabv, vbrewery])
-	#data = np.column_stack([data, vstyle])
-	#data = np.column_stack([data, vcountry])
-	#data = np.column_stack([data, vbrew_with])
-	#data = np.column_stack([data, vferment_years])
+	return vferment_years
 
+
+def structureData(filename):
+
+	lines = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
+
+	print("rows: ", len(lines))
+	print("columns: ", len(lines[0]))
+
+	# Sorting array by drink date
+	print("Sorting array based on drink-date...")
+	dataRaw = lines[np.argsort(lines[:, 10])]
+
+	#Extract labels
+	print("Splitting labels from input...")
+	labels = np.c_[dataRaw[:,5].astype(np.float)]	
+
+	#Structure data columns
+	vbrewery = pandas.get_dummies(dataRaw[:,2],dummy_na=True)
+	vabv = np.c_[dataRaw[:,4].astype(np.float)]		# Need to np.c_[] to define as a column vector for hstack / Need to convert to float because otherwise lasso will convert strings to float representation
+	vstyle = pandas.get_dummies(dataRaw[:,6],dummy_na=True)
+	vcountry = pandas.get_dummies(dataRaw[:,7],dummy_na=True)
+	vbrew_with = np.c_[np.where(dataRaw[:,15] != '', 1, 0)]
+	vferment_years = structureFrementYear(dataRaw[:,16], dataRaw[:,10])
+
+
+	print("Stracking structured vectors...")
 	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
 
 	print("Final Transform Size: ", data.shape)
