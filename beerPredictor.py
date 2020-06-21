@@ -13,6 +13,21 @@ from numpy import loadtxt
 def predictNew(lasso_regressor, X):
 	print(lasso_regressor.predict(X))
 
+def rebuildDummies(columns, value):
+	if(value in columns):
+		columns[columns != value] = 0
+		columns[columns == value] = 1
+	else:
+		columns[columns != 'nan'] = 0
+		columns[columns == 'nan'] = 1
+
+	columns = columns.astype(int)
+	print(columns)
+
+	
+	return columns
+
+
 def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 	print("Loading new data...")
 	lines = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
