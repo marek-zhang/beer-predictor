@@ -10,8 +10,8 @@ from sklearn import metrics as mc
 from numpy import loadtxt
 
 
-def predictNew(lasso_regressor, X):
-	print(lasso_regressor.predict(X))
+def predictNew(lasso_regressor, data):
+	print(lasso_regressor.predict(np.reshape(data, (1, len(data)))))
 
 def rebuildDummies(columns, value):
 	if(value in columns):
@@ -22,8 +22,6 @@ def rebuildDummies(columns, value):
 		columns[columns == 'nan'] = 1
 
 	columns = columns.astype(int)
-	print(columns)
-
 
 	return columns
 
@@ -33,15 +31,23 @@ def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 	dataRaw = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
 
 	#Structure data columns
-	vabv = np.c_[dataRaw[4].astype(np.float)]		# Need to np.c_[] to define as a column vector for hstack / Need to convert to float because otherwise lasso will convert strings to float representation
-	vbrew_with = np.c_[np.where(dataRaw[15] != '', 1, 0)]
-	vferment_years = structureFrementYear(np.array(dataRaw[16]), np.array(dataRaw[10]))
+	vabv = np.array(dataRaw[4].astype(np.float))
+	vbrew_with = np.array(np.where(dataRaw[15] != '', 1, 0))
+	
+	tmpdrink_date = int(dataRaw[10][0:4])
+
+	if(dataRaw[16] == '\\N'):
+		tmpbrew_year = tmpdrink_date
+	else:
+		tmpbrew_year = int(dataRaw[16][0:4])
+
+	vferment_years = np.array(tmpdrink_date - tmpbrew_year)
+
+	print(vferment_years)
 
 	vbrewery = rebuildDummies(vbreweryCol, dataRaw[2])
-	#vstyle = pandas.get_dummies(dataRaw[:,6],dummy_na=True)
-	#vcountry = pandas.get_dummies(dataRaw[:,7],dummy_na=True)
-	
-	print(vbrewery)
+	vstyle = rebuildDummies(vbreweryCol, dataRaw[6])
+	vcountry = rebuildDummies(vbreweryCol, dataRaw[7])
 
 	print("Stracking structured vectors...")
 	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
