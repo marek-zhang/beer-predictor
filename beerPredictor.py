@@ -24,23 +24,24 @@ def rebuildDummies(columns, value):
 	columns = columns.astype(int)
 	print(columns)
 
-	
+
 	return columns
 
 
 def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 	print("Loading new data...")
-	lines = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
+	dataRaw = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
 
 	#Structure data columns
 	vabv = np.c_[dataRaw[:,4].astype(np.float)]		# Need to np.c_[] to define as a column vector for hstack / Need to convert to float because otherwise lasso will convert strings to float representation
 	vbrew_with = np.c_[np.where(dataRaw[:,15] != '', 1, 0)]
 	vferment_years = structureFrementYear(dataRaw[:,16], dataRaw[:,10])
 
-	vbrewery = pandas.get_dummies(dataRaw[:,2],dummy_na=True)
-	vstyle = pandas.get_dummies(dataRaw[:,6],dummy_na=True)
-	vcountry = pandas.get_dummies(dataRaw[:,7],dummy_na=True)
+	vbrewery = rebuildDummies(vbreweryCol, dataRaw[:,2])
+	#vstyle = pandas.get_dummies(dataRaw[:,6],dummy_na=True)
+	#vcountry = pandas.get_dummies(dataRaw[:,7],dummy_na=True)
 	
+	print(vbrewery)
 
 	print("Stracking structured vectors...")
 	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
@@ -131,14 +132,14 @@ def structureFrementYear(tmpbrew_year, tmpdrink_date):
 
 def structureTrainData(filename):
 
-	lines = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
+	dataRaw = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
 
-	print("rows: ", len(lines))
-	print("columns: ", len(lines[0]))
+	print("rows: ", len(dataRaw))
+	print("columns: ", len(dataRaw[0]))
 
 	# Sorting array by drink date
 	print("Sorting array based on drink-date...")
-	dataRaw = lines[np.argsort(lines[:, 10])]
+	dataRaw = dataRaw[np.argsort(dataRaw[:, 10])]
 
 	#Extract labels
 	print("Splitting labels from input...")
