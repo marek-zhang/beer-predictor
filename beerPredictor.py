@@ -74,6 +74,13 @@ def testRegression(lassoRegressor, trainX, trainY, tolerance):
 	accuracy = (count / len(trainPredict)) * 100
 	print("Accuracy of model: ", accuracy)
 
+	result = np.subtract(np.c_[trainPredict], np.c_[trainY])
+	avgDistance = np.average(np.absolute(result))
+	print("Average distance: ", avgDistance)
+
+	print("Max distance: ", result.max())
+	print("Min distance: ", result.min())
+
 
 def trainRegression(trainX, trainY, cvX, cvY):
 
