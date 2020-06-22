@@ -6,7 +6,7 @@ import beerPredictor as bp
 
 lassoRegressor = bp.trainRegression(trainX, trainY, crossValX, crossValY)
 
-bp.testRegression(lassoRegressor, trainX, trainY)
+bp.testRegression(lassoRegressor, trainX, trainY, 0.5)
 
 
 #newX = bp.structureNewData("newBeer.csv", vbreweryCol, vstyleCol, vcountryCol)

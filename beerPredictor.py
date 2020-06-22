@@ -55,7 +55,7 @@ def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 
 
 
-def testRegression(lassoRegressor, trainX, trainY):
+def testRegression(lassoRegressor, trainX, trainY, tolerance):
 	trainPredict = lassoRegressor.predict(trainX)
 
 	count = 0
@@ -67,7 +67,7 @@ def testRegression(lassoRegressor, trainX, trainY):
 	while idx < len(trainPredict):
 		tp = float(trainPredict[idx])
 		ty = float(trainY[idx])
-		if(tp > ty - 0.5 and tp > ty + 0.5 ):
+		if(tp > ty - tolerance and tp < ty + tolerance):
 			count += 1
 		idx += 1
 	
