@@ -10,8 +10,8 @@ from sklearn import metrics as mc
 from numpy import loadtxt
 
 
-def predictNew(lassoRegressor, data):
-	print(lassoRegressor.predict(np.reshape(data, (1, len(data)))))
+def predictNew(lassoRegressor, X):
+	print(lassoRegressor.predict(np.reshape(X, (1, len(X)))))
 
 def rebuildDummies(columns, value):
 	if(value in columns):
@@ -54,6 +54,20 @@ def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 	return data
 
 
+
+def testRegression(lassoRegressor, trainX, trainY):
+	trainPredict = lassoRegressor.predict(trainX)
+
+	count = 0
+
+	for idx in trainPredict:
+		if(trainPredict[idx] > trainY[idx] - 0.5 and trainPredict[idx] > trainY[idx] = 0.5 ):
+			count = count + 1
+	
+	accuracy = (count / len(trainPredict)) * 100
+	print("Accuracy of model: ", accuracy)
+
+
 def trainRegression(trainX, trainY, cvX, cvY):
 
 	
@@ -73,9 +87,6 @@ def trainRegression(trainX, trainY, cvX, cvY):
 		if(newError < oldError or oldError == -1):
 			bestLasso = lasso
 			oldError = newError
-
-
-	print("Error: ", oldError)
 	
 	return bestLasso
 
