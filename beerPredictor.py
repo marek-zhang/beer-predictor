@@ -59,10 +59,17 @@ def testRegression(lassoRegressor, trainX, trainY):
 	trainPredict = lassoRegressor.predict(trainX)
 
 	count = 0
+	idx = 0
 
-	for idx in trainPredict:
-		if(trainPredict[idx] > trainY[idx] - 0.5 and trainPredict[idx] > trainY[idx] = 0.5 ):
-			count = count + 1
+	np.savetxt("trainY.txt", trainY, comments='`')
+	np.savetxt("predictY.txt", trainPredict, comments='`')
+
+	while idx < len(trainPredict):
+		tp = float(trainPredict[idx])
+		ty = float(trainY[idx])
+		if(tp > ty - 0.5 and tp > ty + 0.5 ):
+			count += 1
+		idx += 1
 	
 	accuracy = (count / len(trainPredict)) * 100
 	print("Accuracy of model: ", accuracy)
