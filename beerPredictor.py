@@ -10,8 +10,8 @@ from sklearn import metrics as mc
 from numpy import loadtxt
 
 
-def predictNew(lasso_regressor, data):
-	print(lasso_regressor.predict(np.reshape(data, (1, len(data)))))
+def predictNew(lassoRegressor, data):
+	print(lassoRegressor.predict(np.reshape(data, (1, len(data)))))
 
 def rebuildDummies(columns, value):
 	if(value in columns):
@@ -54,7 +54,7 @@ def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 	return data
 
 
-def runRegression(X, Y, cvX, cvY):
+def trainRegression(trainX, trainY, cvX, cvY):
 
 	
 	lasso = lm.Lasso(max_iter = 2000)
@@ -65,7 +65,7 @@ def runRegression(X, Y, cvX, cvY):
 
 	for alpha in alphas:
 		lasso = lm.Lasso(alpha=alpha, max_iter = 2000)
-		lasso.fit(X, Y)
+		lasso.fit(trainX, trainY)
 		cvPredict = lasso.predict(cvX)
 		newError = mc.mean_squared_error(cvPredict, cvY)
 
@@ -78,23 +78,6 @@ def runRegression(X, Y, cvX, cvY):
 	print("Error: ", oldError)
 	
 	return bestLasso
-
-	#lasso_regressor = GridSearchCV(lasso, parameters, scoring='neg_mean_squared_error', cv=5)
-
-	#setup a for loop 
-	#mean squared error takes a higher punishment for values that are far away
-	#there is a big incentive for model to fit around the 
-
-	#I could find one that has an L1 loss 
-	# bin the output values of the test set 
-
-	#a confusion matrix
-
-	#mean absolute error 
-
-
-	return lasso_regressor
-
 
 
 
@@ -133,9 +116,6 @@ def splitSets(data, label, testPercent, crossValPercent, trainPercent):
 	trainY = label[trainRowStart : trainRowEnd]
 
 	return (trainX, trainY, crossValX, crossValY, testX, testY)
-
-
-
 
 def structureTrainFrementYear(tmpbrew_year, tmpdrink_date):
 	tmpbrew_year[tmpbrew_year == '\\N'] = 0
