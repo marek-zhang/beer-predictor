@@ -43,8 +43,6 @@ def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 
 	vferment_years = np.array(tmpdrink_date - tmpbrew_year)
 
-	print(vferment_years)
-
 	vbrewery = rebuildDummies(vbreweryCol, dataRaw[2])
 	vstyle = rebuildDummies(vstyleCol, dataRaw[6])
 	vcountry = rebuildDummies(vcountryCol, dataRaw[7])
@@ -87,7 +85,7 @@ def trainRegression(trainX, trainY, cvX, cvY):
 	
 	lasso = lm.Lasso(max_iter = 2000)
 
-	alphas = [0.0001, 0.0003, 0.001, 0.003, 0.03, 0.1, 0.3, 1, 3]
+	alphas = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000, 3000]
 
 	oldError = -1
 
@@ -95,13 +93,16 @@ def trainRegression(trainX, trainY, cvX, cvY):
 		lasso = lm.Lasso(alpha=alpha, max_iter = 2000)
 		lasso.fit(trainX, trainY)
 		cvPredict = lasso.predict(cvX)
-		newError = mc.mean_squared_error(cvPredict, cvY)
+		newError = mc.mean_squared_error(cvY, cvPredict)
+		#newError = mc.r2_score(cvY, cvPredict)
+		#newError = mc.mean_absolute_error(cvY, cvPredict)
 
-		
+
 		if(newError < oldError or oldError == -1):
 			bestLasso = lasso
 			oldError = newError
 	
+	print("alpha for best Lasso: ", bestLasso.alpha)
 	return bestLasso
 
 
@@ -184,6 +185,7 @@ def structureTrainData(filename):
 
 	print("Stracking structured vectors...")
 	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
+
 
 	print("Final transform size: ", data.shape)
 
