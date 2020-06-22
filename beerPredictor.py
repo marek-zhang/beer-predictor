@@ -59,15 +59,39 @@ def runRegression(X, Y, cvX, cvY):
 	
 	lasso = lm.Lasso(max_iter = 2000)
 
-	parameters = {'alpha': [0.0001, 0.0003, 0.001, 0.003, 0.03, 0.1, 0.3, 1, 3]}
+	alphas = [0.0001, 0.0003, 0.001, 0.003, 0.03, 0.1, 0.3, 1, 3]
 
-	lasso_regressor = GridSearchCV(lasso, parameters, scoring='neg_mean_squared_error', cv=5)
+	oldError = -1
 
-	lasso_regressor.fit(X, Y)
+	for alpha in alphas:
+		lasso = lm.Lasso(alpha=alpha, max_iter = 2000)
+		lasso.fit(X, Y)
+		cvPredict = lasso.predict(cvX)
+		newError = mc.mean_squared_error(cvPredict, cvY)
+
+		
+		if(newError < oldError or oldError == -1):
+			bestLasso = lasso
+			oldError = newError
 
 
-	print(lasso_regressor.best_params_)
-	print(lasso_regressor.best_score_)
+	print("Error: ", oldError)
+	
+	return bestLasso
+
+	#lasso_regressor = GridSearchCV(lasso, parameters, scoring='neg_mean_squared_error', cv=5)
+
+	#setup a for loop 
+	#mean squared error takes a higher punishment for values that are far away
+	#there is a big incentive for model to fit around the 
+
+	#I could find one that has an L1 loss 
+	# bin the output values of the test set 
+
+	#a confusion matrix
+
+	#mean absolute error 
+
 
 	return lasso_regressor
 
