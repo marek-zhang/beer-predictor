@@ -11,7 +11,10 @@ from numpy import loadtxt
 
 
 def predictNew(lassoRegressor, X):
-	print(lassoRegressor.predict(np.reshape(X, (1, len(X)))))
+	#print(lassoRegressor.predict(np.reshape(X, (1, len(X)))))
+	predictY = lassoRegressor.predict(X)
+	np.savetxt("results.txt",predictY)
+
 
 def rebuildDummies(columns, value):
 	if(value in columns):
@@ -26,9 +29,9 @@ def rebuildDummies(columns, value):
 	return columns
 
 
-def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
-	print("Loading new data...")
-	dataRaw = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
+def structureNewDataSingle(dataRaw, vbreweryCol, vstyleCol, vcountryCol):
+
+	#dataRaw = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
 
 	#Structure data columns
 	vabv = np.array(dataRaw[4].astype(np.float))
@@ -51,6 +54,25 @@ def structureNewData(filename, vbreweryCol, vstyleCol, vcountryCol):
 
 	return data
 
+
+def structureNewDataMulti(filename, vbreweryCol, vstyleCol, vcountryCol, totalCols):
+	dataRaw = loadtxt(filename, dtype=str, comments="`", delimiter="|", unpack=False)
+	dataArr = np.array(dataRaw)
+	(r,c) = dataArr.shape
+
+	dataPredict = np.empty([r,totalCols])
+
+	idx = 0
+
+	while idx < r:
+		example = dataArr[idx,:]
+		#print(example)
+		dataPredict[idx,:] = structureNewDataSingle( example, vbreweryCol, vstyleCol, vcountryCol)
+		idx += 1
+	#dataArr = np.reshape(X, (1, len(X)))
+	
+
+	return dataPredict
 
 
 def testRegression(lassoRegressor, trainX, trainY, tolerance):
@@ -186,6 +208,7 @@ def structureTrainData(filename):
 	print("Stracking structured vectors...")
 	data = np.hstack((vabv, vbrewery, vstyle, vcountry, vbrew_with, vferment_years))
 
+	(r,c) = data.shape
 
 	print("Final transform size: ", data.shape)
 
@@ -199,14 +222,14 @@ def structureTrainData(filename):
 
 
 
-	plt.hist(np.round_(labels, decimals=2))
-	plt.title('title name')
-	plt.xlabel('xAxis name')
-	plt.ylabel('yAxis name')
-	plt.show()
+	#plt.hist(np.round_(labels, decimals=2))
+	#plt.title('title name')
+	#plt.xlabel('xAxis name')
+	#plt.ylabel('yAxis name')
+	#plt.show()
 
 
 
-	return (data, labels, vbreweryCol, vstyleCol, vcountryCol)
+	return (data, labels, vbreweryCol, vstyleCol, vcountryCol, c)
 
 
