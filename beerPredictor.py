@@ -198,6 +198,15 @@ def structureTrainData(filename):
 	print("CountryCol: ", len(vcountryCol))
 
 
+
+	plt.hist(np.round_(labels, decimals=2))
+	plt.title('title name')
+	plt.xlabel('xAxis name')
+	plt.ylabel('yAxis name')
+	plt.show()
+
+
+
 	return (data, labels, vbreweryCol, vstyleCol, vcountryCol)
 
 
